@@ -95,7 +95,7 @@ app.get("/", async (req, res) => {
 
 app.post("/register", upload.none(), async (req, res) => {
   if (req.isAuthenticated()) {
-    const { username: discordUsername, id } = req.user;
+    const { id } = req.user;
     const { username, password, passwordconfirm } = req.body;
 
     if (password !== passwordconfirm) {
@@ -105,7 +105,7 @@ app.post("/register", upload.none(), async (req, res) => {
     try {
       const form = new FormData();
       form.append('username', username);
-      form.append('email', discordUsername + '@discord.com');
+      form.append('email', id + '@discord.com');
       form.append('password', password);
       form.append('key', process.env.REG_KEY);
 
