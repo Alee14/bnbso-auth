@@ -1,5 +1,5 @@
 # bnbso-auth
-Web authentication for bnbSO (registering accounts, resetting passwords, changing passwords) using Discord authentication. Programmed for FreeSO-based servers.
+Web authentication for bnbSO (registering accounts, resetting passwords, changing passwords) using Discord authentication. Designed for FreeSO-based servers.
 
 To install dependencies:
 

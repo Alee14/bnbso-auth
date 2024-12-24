@@ -4,15 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/css/style.css">
-    <title>bnbSO</title>
+    <title>bnbSO Dashboard</title>
 </head>
 <body>
     <div class="background"></div>
     <div class="container">
         <img src="img/logo.png" alt="logo" width="200">
-        <p>Created account successfully!</p>
-        <p>Check on your inbox for the confirmation code.</p>
-        <a href="/">Dashboard</a>
+        <p>Welcome, <%= username %>!</p>
+        <p>FreeSO Username:</p>
+        <a href="#" class="button">Change Password</a>
+        <a href="#" class="button">Download bnbSO Client</a>
+        <a href="/logout" class="button logout">Logout</a>
     </div>
 </body>
 </html>

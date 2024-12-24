@@ -62,13 +62,13 @@ app.use(passport.session());
 // Routes
 app.get("/", async (req, res) => {
   if (req.isAuthenticated()) {
-    const { id, username, email, guilds } = req.user;
+    const { id, guilds } = req.user;
     const isInGuild = guilds.some((guild) => guild.id === process.env.GUILD_ID);
 
     if (isInGuild) {
-      let userExists = true;
+      let userExists = false;
         if (userExists) {
-            return res.render('login');
+            return res.render('dashboard', req.user);
         } else {
           return res.render('register', req.user);
         }
@@ -137,4 +137,4 @@ app.get("/logout", (req, res) => {
 });
 
 const port = 3000;
-app.listen(PORT, () => console.log(`Server running on http://localhost:${port}`));
+app.listen(port, () => console.log(`Server running on http://localhost:${port}`));
