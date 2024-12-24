@@ -3,6 +3,7 @@ import session from "express-session";
 import multer from "multer";
 import passport from "passport";
 import { Strategy as DiscordStrategy } from "passport-discord";
+import sqlite3 from 'sqlite3';
 import path from "path";
 import { fileURLToPath } from 'url';
 import dotenv from "dotenv";
@@ -17,6 +18,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const statusMessages = JSON.parse(fs.readFileSync(path.join(__dirname, 'status.json'), 'utf8'));
+const db = new sqlite3.Database('./database.db');
 
 const upload = multer();
 const app = express();
@@ -28,6 +30,11 @@ app.set('view engine', 'ejs');
 app.use(express.static(path.join(__dirname, 'public')));
 app.set('views', path.join(__dirname, 'views'));
 
+db.run(`CREATE TABLE IF NOT EXISTS users (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  discord_id TEXT NOT NULL,
+  fso_username TEXT NOT NULL
+)`);
 
 // Passport session setup
 passport.serializeUser((user, done) => done(null, user));
@@ -40,7 +47,7 @@ passport.use(
       clientID: process.env.CLIENT_ID,
       clientSecret: process.env.CLIENT_SECRET,
       callbackURL: process.env.REDIRECT_URI,
-      scope: ["identify", "email", "guilds"],
+      scope: ["identify", "guilds"],
     },
     (accessToken, refreshToken, profile, done) => {
       return done(null, profile);
@@ -66,14 +73,20 @@ app.get("/", async (req, res) => {
     const isInGuild = guilds.some((guild) => guild.id === process.env.GUILD_ID);
 
     if (isInGuild) {
-      let userExists = false;
-        if (userExists) {
-            return res.render('dashboard', req.user);
+      db.get(`SELECT * FROM users WHERE discord_id = ?`, [id], (err, row) => {
+        if (err) {
+          console.error("Error querying the database:", err);
+          return res.render('error', { error: 'An error occurred while checking user data.' });
+        }
+
+        if (row) {
+          return res.render('dashboard', { ...req.user, fso_username: row.fso_username });
         } else {
           return res.render('register', req.user);
         }
+      });
     } else {
-        return res.render('error', { error: 'You must be a member of the bits & Bytes server to access this page.' });
+      return res.render('error', { error: 'You must be a member of the bits & Bytes server to access this page.' });
     }
   } else {
     res.render('index');
@@ -82,18 +95,19 @@ app.get("/", async (req, res) => {
 
 app.post("/register", upload.none(), async (req, res) => {
   if (req.isAuthenticated()) {
-    const { id } = req.user;
-    const { username, email, password, password2 } = req.body;
+    const { username: discordUsername, id } = req.user;
+    const { username, password, passwordconfirm } = req.body;
 
-    if (password !== password2) {
+    if (password !== passwordconfirm) {
       return res.render('register', { ...req.user, error: "Passwords do not match" });
     }
 
     try {
       const form = new FormData();
       form.append('username', username);
-      form.append('email', email);
+      form.append('email', discordUsername + '@discord.com');
       form.append('password', password);
+      form.append('key', process.env.REG_KEY);
 
       const response = await axios.post(`${process.env.API_URL}/userapi/registration`, form, {
         headers: form.getHeaders()
@@ -104,12 +118,17 @@ app.post("/register", upload.none(), async (req, res) => {
         const errorMessage = statusMessages.registration_errors[errorKey] || "Something went wrong";
         return res.render('register', { ...req.user, error: errorMessage });
       } else {
-        console.log(`Discord ID: ${id}`)
-        return res.render('success');
+        db.run(`INSERT INTO users (discord_id, fso_username) VALUES (?, ?)`, [id, username], function(err) {
+          if (err) {
+            console.error("Error inserting user data into database:", err);
+            return res.render('register', { ...req.user, error: "An error occurred during registration, contact server operator." });
+          }
+          return res.render('success');
+        });
       }
     } catch (error) {
       console.error("Error during registration:", error);
-      return res.render('register', { ...req.user, error: "An error occurred during registration" });
+      return res.render('register', { ...req.user, error: "An error occurred during registration, contact server operator." });
     }
   } else {
     res.redirect("/");
@@ -118,7 +137,7 @@ app.post("/register", upload.none(), async (req, res) => {
 
 app.get(
   "/auth/discord",
-  passport.authenticate("discord", { scope: ["identify", "email", "guilds"] })
+  passport.authenticate("discord", { scope: ["identify", "guilds"] })
 );
 
 app.get(
