@@ -1,29 +1,28 @@
 {
     "registration_errors": {
-      "missing_confirmation_token": "Registration failed: Missing confirmation token.",
-      "user_short": "Registration failed: Username is too short.",
-      "user_long": "Registration failed: Username is too long.",
-      "user_invalid": "Registration failed: Invalid username.",
-      "pass_required": "Registration failed: Password is required.",
-      "email_invalid": "Registration failed: Invalid email address.",
-      "ip_banned": "Registration failed: IP is banned.",
-      "registrations_too_frequent": "Registration failed: Too many registrations from this IP address.",
-      "user_exists": "Registration failed: User already exists.",
-      "smtp_disabled": "Registration failed: SMTP service is disabled.",
-      "email_taken": "Registration failed: Email address is already taken.",
-      "confirmation_pending": "Registration failed: Confirmation pending.",
-      "key_wrong": "Registration failed: Invalid registration key."
+      "missing_confirmation_token": "Missing confirmation token.",
+      "user_short": "Username is too short.",
+      "user_long": "Username is too long.",
+      "user_invalid": "Invalid username.",
+      "pass_required": "Password is required.",
+      "email_invalid": "Invalid email address.",
+      "ip_banned": "IP is banned.",
+      "registrations_too_frequent": "Too many registrations from this IP address.",
+      "user_exists": "User already exists.",
+      "smtp_disabled": "SMTP service is disabled.",
+      "email_taken": "Email address is already taken.",
+      "confirmation_pending": "Confirmation pending.",
+      "key_wrong": "Invalid registration key."
     },
     "password_reset_errors": {
-      "missing_fields": "Password reset failed: Missing required fields.",
-      "email_invalid": "Password reset failed: Invalid email address.",
-      "user_invalid": "Password reset failed: User does not exist.",
-      "incorrect_password": "Password reset failed: Incorrect password.",
-      "invalid_token": "Password reset failed: Invalid confirmation token."
+      "missing_fields": "Missing required fields.",
+      "email_invalid": "Invalid email address.",
+      "user_invalid": "User does not exist.",
+      "incorrect_password": "Incorrect password.",
+      "invalid_token": "Invalid confirmation token."
     },
     "success_responses": {
       "success": "Operation was successful.",
       "email_failed": "Email sending failed."
     }
   }
-  

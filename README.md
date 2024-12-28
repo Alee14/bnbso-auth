@@ -1,5 +1,5 @@
 # bnbso-auth
-Web authentication for bnbSO (registering accounts, resetting passwords, changing passwords) using Discord authentication. Designed for FreeSO-based servers.
+Web authentication for bnbSO (registering accounts, changing passwords) using Discord authentication. Designed for FreeSO-based servers.
 
 To install dependencies:
 
@@ -10,7 +10,7 @@ bun install
 To run:
 
 ```bash
-bun run index.ts
+bun run index.js
 ```
 
 This project was created using `bun init` in bun v1.1.38. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.

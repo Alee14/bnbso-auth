@@ -86,7 +86,7 @@ app.get("/", async (req, res) => {
         }
       });
     } else {
-      return res.render('error', { error: 'You must be a member of the bits & Bytes server to access this page.' });
+      return res.render('error', { error: 'You must be a member of that server to access this page.' });
     }
   } else {
     res.render('index');
@@ -105,7 +105,7 @@ app.post("/register", upload.none(), async (req, res) => {
     try {
       const form = new FormData();
       form.append('username', username);
-      form.append('email', id + '@discord.com');
+      form.append('email', `${id}@discord.com`);
       form.append('password', password);
       form.append('key', process.env.REG_KEY);
 
@@ -123,7 +123,7 @@ app.post("/register", upload.none(), async (req, res) => {
             console.error("Error inserting user data into database:", err);
             return res.render('register', { ...req.user, error: "An error occurred during registration, contact server operator." });
           }
-          return res.render('success');
+          return res.render('success', { ...req.user, success: "Created account successfully!"});
         });
       }
     } catch (error) {
@@ -131,7 +131,62 @@ app.post("/register", upload.none(), async (req, res) => {
       return res.render('register', { ...req.user, error: "An error occurred during registration, contact server operator." });
     }
   } else {
-    res.redirect("/");
+    res.status(401).send("Unauthorized.");
+  }
+});
+
+app.get('/password', (req, res) => {
+  if (req.isAuthenticated()) {
+    res.render('password');
+  } else {
+    res.redirect("/auth/discord");
+  }
+});
+
+app.post('/password/change', upload.none(), async (req, res) => {
+  if (req.isAuthenticated()) {
+    const { id } = req.user;
+    const { currentpassword, newpassword, newpassword2 } = req.body;
+
+    if (newpassword !== newpassword2) {
+      return res.render('password', { ...req.user, error: "Passwords do not match" });
+    }
+
+    try {
+      db.get(`SELECT * FROM users WHERE discord_id = ?`, [id], async (err, row) => {
+        if (err) {
+          console.error("Error querying the database:", err);
+          return res.render('password', {...req.user, error: "An error occurred while checking user data."});
+        }
+
+        if (row) {
+          const form = new FormData();
+          form.append('username', row.fso_username);
+          form.append('old_password', currentpassword);
+          form.append('new_password', newpassword);
+
+          const response = await axios.post(`${process.env.API_URL}/userapi/password`, form, {
+            headers: form.getHeaders()
+          });
+
+          if (response.data.error) {
+            const errorKey = response.data.error_description || "default";
+            const errorMessage = statusMessages.password_reset_errors[errorKey] || "Something went wrong";
+
+            return res.render('password', { ...req.user, error: errorMessage });
+          }
+
+          return res.render('success', { ...req.user, success: "Password changed successfully!" });
+        }
+      });
+
+    } catch (error) {
+      console.error("Error during password change:", error);
+      return res.render('password', { ...req.user, error: "An error occurred during password change, contact server operator." });
+    }
+
+  } else {
+    res.status(401).send("Unauthorized.");
   }
 });
 

@@ -1,7 +1,10 @@
 {
   "name": "bnbso-auth",
-  "module": "index.ts",
+  "module": "index.js",
   "type": "module",
+  "scripts": {
+    "start": "node index.js"
+  },
   "devDependencies": {
     "@types/bun": "latest"
   },

@@ -9,12 +9,44 @@
 <body>
     <div class="background"></div>
     <div class="container">
-        <img src="img/logo.png" alt="logo" width="200">
+        <img src="/img/logo.png" alt="logo" width="200">
         <h1>Welcome, <%= username %>!</h1>
-        <h2>FreeSO Username: <%= fso_username %></h2>
-        <a href="#" class="button">Change Password</a>
-        <a href="#" class="button">Download bnbSO Client</a>
+        <h2>bnbSO Username: <%= fso_username %></h2>
+        <h2 id="simtime"></h2>
+        <a href="/password" class="button">Change Password</a>
+        <a href="https://fso-builds.riperiperi.workers.dev" class="button">Download bnbSO Client</a>
         <a href="/logout" class="button logout">Logout</a>
     </div>
+    <script>
+        function updateTSOClock() {
+            const currentTime = new Date(),
+                utcMinutes = currentTime.getUTCMinutes(),
+                utcSeconds = currentTime.getUTCSeconds();
+            let timePeriod = 'AM', totalSeconds = 0;
+            if (currentTime.getUTCHours() % 2 === 1) {
+                totalSeconds = 3600;
+                timePeriod = 'PM';
+            }
+            totalSeconds += utcMinutes * 60 + utcSeconds;
+            let hour = Math.floor(totalSeconds / 300);
+            if (hour > 12) {
+                hour -= 12;
+            }
+            if (hour === 0) {
+                hour = 12;
+            }
+            let minute = Math.floor(totalSeconds % 300 / 5);
+            if (minute < 10) {
+                minute = '0' + minute;
+            }
+            const simTimeElement = document.querySelector('#simtime');
+            if (simTimeElement) {
+                simTimeElement.textContent = `${hour}:${minute} ${timePeriod}`;
+            }
+        }
+
+        setInterval(updateTSOClock, 1000);
+        updateTSOClock();
+    </script>
 </body>
 </html>
