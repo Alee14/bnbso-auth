@@ -12,7 +12,6 @@
         <img src="/img/logo.png" alt="logo" width="200">
         <h1>Welcome to bnbSO!</h1>
         <p>You will be sending the following information to register your bnbSO account</p>
-        <p>Please verify that the following information is correct. You can only change your username <b>once</b>.</p>
         <form method="post" action="/register">
             <label for="username">Username:</label>
             <input type="text" id="username" name="username">
@@ -22,6 +21,7 @@
             <input type="password" id="passwordconfirm" name="passwordconfirm">
             <button type="submit">Register</button>
         </form>
+<!--        <a href="#">Link your bnbSO account</a>-->
         <% if (typeof error !== 'undefined') { %>
             <div class="error"><%= error %></div>
         <% } %>

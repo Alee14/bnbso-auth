@@ -80,16 +80,15 @@ app.get("/", async (req, res) => {
         }
 
         if (row) {
-          return res.render('dashboard', { ...req.user, fso_username: row.fso_username });
+          return res.render('dashboard', { ...req.user, fso_username: row.fso_username, serverName: process.env.SERVER_NAME || 'FreeSO' });
         } else {
           return res.render('register', req.user);
         }
       });
     } else {
-      return res.render('error', { error: 'You must be a member of that server to access this page.' });
-    }
+      return res.render('error-login', { error: 'You must be a member of that server to access this page.' });    }
   } else {
-    res.render('index');
+    res.render('index', { serverName: process.env.SERVER_NAME || 'FreeSO', discordName: process.env.DISCORD_NAME || 'Discord' });
   }
 });
 
@@ -139,7 +138,7 @@ app.get('/password', (req, res) => {
   if (req.isAuthenticated()) {
     res.render('password');
   } else {
-    res.redirect("/auth/discord");
+    res.redirect("/login");
   }
 });
 
@@ -174,24 +173,22 @@ app.post('/password/change', upload.none(), async (req, res) => {
             const errorMessage = statusMessages.password_reset_errors[errorKey] || "Something went wrong";
 
             return res.render('password', { ...req.user, error: errorMessage });
+          } else {
+            return res.render('success', { ...req.user, success: "Password changed successfully!" });
           }
-
-          return res.render('success', { ...req.user, success: "Password changed successfully!" });
         }
       });
-
     } catch (error) {
       console.error("Error during password change:", error);
       return res.render('password', { ...req.user, error: "An error occurred during password change, contact server operator." });
     }
-
   } else {
     res.status(401).send("Unauthorized.");
   }
 });
 
 app.get(
-  "/auth/discord",
+  "/login",
   passport.authenticate("discord", { scope: ["identify", "guilds"] })
 );
 

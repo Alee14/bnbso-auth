@@ -127,6 +127,7 @@ input[type=password] {
 
 button {
     background-color: #00633a;
+    font-size: 1em;
     color: white;
     padding: 14px 20px;
     margin: 8px 0;
@@ -134,6 +135,14 @@ button {
     cursor: pointer;
     border-radius: 5px;
     transition: 0.2s;
+}
+
+button:hover {
+    background-color: #008c4a;
+}
+
+button:active {
+    background-color: #008c4a;
 }
 
 .error {
