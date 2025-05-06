@@ -76,19 +76,19 @@ app.get("/", async (req, res) => {
       db.get(`SELECT * FROM users WHERE discord_id = ?`, [id], (err, row) => {
         if (err) {
           console.error("Error querying the database:", err);
-          return res.render('error', { error: 'An error occurred while checking user data.' });
+          return res.render('error', { serverName: process.env.SERVER_NAME || 'FreeSO', error: 'An error occurred while checking user data.' });
         }
 
         if (row) {
-          return res.render('dashboard', { ...req.user, fso_username: row.fso_username, serverName: process.env.SERVER_NAME || 'FreeSO' });
+          return res.render('dashboard', { ...req.user, serverName: process.env.SERVER_NAME || 'FreeSO', fso_username: row.fso_username, client_download: process.env.CLIENT_DOWNLOAD || 'https://fso-builds.riperiperi.workers.dev' });
         } else {
-          return res.render('register', req.user);
+          return res.render('register', { ...req.user, serverName: process.env.SERVER_NAME || 'FreeSO' } );
         }
       });
     } else {
-      return res.render('error-login', { error: 'You must be a member of that server to access this page.' });    }
+      return res.render('error-login', { serverName: process.env.SERVER_NAME || 'FreeSO', error: 'You must be a member of that server to access this page.' });    }
   } else {
-    res.render('index', { serverName: process.env.SERVER_NAME || 'FreeSO', discordName: process.env.DISCORD_NAME || 'Discord' });
+    res.render('index', { serverName: process.env.SERVER_NAME || 'FreeSO', logo: process.env.LOGO || '/img/logo.png' , discordName: process.env.DISCORD_NAME || 'Discord' });
   }
 });
 
@@ -98,7 +98,7 @@ app.post("/register", upload.none(), async (req, res) => {
     const { username, password, passwordconfirm } = req.body;
 
     if (password !== passwordconfirm) {
-      return res.render('register', { ...req.user, error: "Passwords do not match" });
+      return res.render('register', { ...req.user, serverName: process.env.SERVER_NAME || 'FreeSO', error: "Passwords do not match" });
     }
 
     try {
@@ -115,19 +115,19 @@ app.post("/register", upload.none(), async (req, res) => {
       if (response.data.error) {
         const errorKey = response.data.error_description || "default";
         const errorMessage = statusMessages.registration_errors[errorKey] || "Something went wrong";
-        return res.render('register', { ...req.user, error: errorMessage });
+        return res.render('register', { ...req.user, serverName: process.env.SERVER_NAME || 'FreeSO', error: errorMessage });
       } else {
         db.run(`INSERT INTO users (discord_id, fso_username) VALUES (?, ?)`, [id, username], function(err) {
           if (err) {
             console.error("Error inserting user data into database:", err);
-            return res.render('register', { ...req.user, error: "An error occurred during registration, contact server operator." });
+            return res.render('register', { ...req.user, serverName: process.env.SERVER_NAME || 'FreeSO', error: "An error occurred during registration, contact server operator." });
           }
-          return res.render('success', { ...req.user, success: "Created account successfully!"});
+          return res.render('success', { ...req.user, serverName: process.env.SERVER_NAME || 'FreeSO', success: "Created account successfully!"});
         });
       }
     } catch (error) {
       console.error("Error during registration:", error);
-      return res.render('register', { ...req.user, error: "An error occurred during registration, contact server operator." });
+      return res.render('register', { ...req.user, serverName: process.env.SERVER_NAME || 'FreeSO' ,error: "An error occurred during registration, contact server operator." });
     }
   } else {
     res.status(401).send("Unauthorized.");
@@ -136,7 +136,7 @@ app.post("/register", upload.none(), async (req, res) => {
 
 app.get('/password', (req, res) => {
   if (req.isAuthenticated()) {
-    res.render('password');
+    res.render('password', { serverName: process.env.SERVER_NAME || 'FreeSO' });
   } else {
     res.redirect("/login");
   }
@@ -145,24 +145,24 @@ app.get('/password', (req, res) => {
 app.post('/password/change', upload.none(), async (req, res) => {
   if (req.isAuthenticated()) {
     const { id } = req.user;
-    const { currentpassword, newpassword, newpassword2 } = req.body;
+    const { newpassword, newpassword2 } = req.body;
 
     if (newpassword !== newpassword2) {
-      return res.render('password', { ...req.user, error: "Passwords do not match" });
+      return res.render('password', { ...req.user, serverName: process.env.SERVER_NAME || 'FreeSO', error: "Passwords do not match" });
     }
 
     try {
       db.get(`SELECT * FROM users WHERE discord_id = ?`, [id], async (err, row) => {
         if (err) {
           console.error("Error querying the database:", err);
-          return res.render('password', {...req.user, error: "An error occurred while checking user data."});
+          return res.render('password', {...req.user, serverName: process.env.SERVER_NAME || 'FreeSO', error: "An error occurred while checking user data."});
         }
 
         if (row) {
           const form = new FormData();
           form.append('username', row.fso_username);
-          form.append('old_password', currentpassword);
           form.append('new_password', newpassword);
+          form.append('key', process.env.REG_KEY);
 
           const response = await axios.post(`${process.env.API_URL}/userapi/password`, form, {
             headers: form.getHeaders()
@@ -172,15 +172,15 @@ app.post('/password/change', upload.none(), async (req, res) => {
             const errorKey = response.data.error_description || "default";
             const errorMessage = statusMessages.password_reset_errors[errorKey] || "Something went wrong";
 
-            return res.render('password', { ...req.user, error: errorMessage });
+            return res.render('password', { ...req.user, serverName: process.env.SERVER_NAME || 'FreeSO', error: errorMessage });
           } else {
-            return res.render('success', { ...req.user, success: "Password changed successfully!" });
+            return res.render('success', { ...req.user, serverName: process.env.SERVER_NAME || 'FreeSO', success: "Password changed successfully!" });
           }
         }
       });
     } catch (error) {
       console.error("Error during password change:", error);
-      return res.render('password', { ...req.user, error: "An error occurred during password change, contact server operator." });
+      return res.render('password', { ...req.user, serverName: process.env.SERVER_NAME || 'FreeSO', error: "An error occurred during password change, contact server operator." });
     }
   } else {
     res.status(401).send("Unauthorized.");

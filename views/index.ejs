@@ -4,12 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/css/style.css">
-    <title>bnbSO</title>
+    <title><%= serverName %></title>
 </head>
 <body>
     <div class="background"></div>
     <div class="container">
-        <img src="/img/logo.png" alt="logo" width="200">
+        <img src=<%= logo %> alt="logo" width="200">
         <p>Log into your Discord account to get access to <%= serverName %>.</p>
         <p><i>You must be a <%= discordName %> member.</i></p>
         <a class="button discord" href="/login">Login with Discord</a>

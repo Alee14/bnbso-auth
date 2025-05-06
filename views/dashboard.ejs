@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/css/style.css">
-    <title>bnbSO Dashboard</title>
+    <title><%= serverName %> Dashboard</title>
 </head>
 <body>
     <div class="background"></div>
@@ -13,7 +13,7 @@
         <h2><%= serverName %> Username: <%= fso_username %></h2>
         <h2 id="simtime"></h2>
         <a href="/password" class="button">Change Password</a>
-        <a href="https://fso-builds.riperiperi.workers.dev" class="button">Download <%= serverName %> Client</a>
+        <a href=<%= client_download %> class="button">Download <%= serverName %> Client</a>
         <a href="/logout" class="button logout">Logout</a>
     </div>
     <script>

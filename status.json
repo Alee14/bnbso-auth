@@ -19,7 +19,8 @@
       "email_invalid": "Invalid email address.",
       "user_invalid": "User does not exist.",
       "incorrect_password": "Incorrect password.",
-      "invalid_token": "Invalid confirmation token."
+      "invalid_token": "Invalid confirmation token.",
+      "key_invalid": "Invalid key."
     },
     "success_responses": {
       "success": "Operation was successful.",
